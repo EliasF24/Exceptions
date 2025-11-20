@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercices MySQL - Gestion des Exceptions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .instructions {
+            background: #e8f4fc;
+            padding: 1.5rem;
+            border-bottom: 2px solid #b3d9ff;
+        }
+
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction-icon {
+            font-size: 1.2rem;
+            min-width: 25px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 700px;
+        }
+
+        .exercises-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-right: 2px solid #e9ecef;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .exercise-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .exercise-card.active {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+
+        .exercise-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exercise-icon {
+            font-size: 1.5rem;
+        }
+
+        .exercise-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-objective {
+            background: #fff3cd;
+            padding: 0.8rem;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            font-size: 0.85rem;
+        }
+
+        .objective-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 0.3rem;
+        }
+
+        .code-section {
+            padding: 2rem;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .code-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .statement-section {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 2px dashed #dee2e6;
+        }
+
+        .statement-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .statement-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .requirements {
+            background: #e7f3ff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid #3498db;
+        }
+
+        .requirements-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .requirements-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .requirements-list li {
+            margin-bottom: 0.3rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .requirements-list li:before {
+            content: "•";
+            color: #3498db;
+            font-weight: bold;
+            position: absolute;
+            left: 0.5rem;
+        }
+
+        .hint-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .hint-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercises-section {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+            }
+            
+            .instructions-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .difficulty.easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty.hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Gestion des Exceptions MySQL</h1>
+            <p class="subtitle">Exercices pratiques - Énoncés seulement</p>
+        </header>
+
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <div class="instructions-content">
+                <div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">👉</span>
+                        <span>Sélectionnez un exercice pour voir son énoncé</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">💡</span>
+                        <span>Lisez attentivement les consignes et objectifs</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">⚡</span>
+                        <span>Implémentez la solution dans votre SGBD MySQL</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">🎯</span>
+                        <span>Respectez les exigences techniques demandées</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">🔍</span>
+                        <span>Testez votre code avec différents scénarios</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">✅</span>
+                        <span>Vérifiez le comportement des handlers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="exercises-section">
+                <div class="exercise-card active" onclick="selectExercise(1)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">🚫</span>
+                        Handler EXIT - Erreur NOT NULL
+                        <span class="difficulty easy">Facile</span>
+                    </div>
+                    <p class="exercise-description">
+                        Gestion d'erreur avec handler EXIT pour les violations de contrainte NOT NULL.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Comprendre le comportement du handler EXIT et son impact sur le flux d'exécution.
+                    </div>
+                </div>
+
+                <div class="exercise-card" onclick="selectExercise(2)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">🔍</span>
+                        Handler EXIT - NOT FOUND
+                        <span class="difficulty easy">Facile</span>
+                    </div>
+                    <p class="exercise-description">
+                        Utilisation de SELECT INTO avec gestion d'erreur NOT FOUND.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Maîtriser la gestion des requêtes qui ne retournent aucun résultat.
+                    </div>
+                </div>
+
+                <div class="exercise-card" onclick="selectExercise(3)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">➡️</span>
+                        Handler CONTINUE - Doublons
+                        <span class="difficulty medium">Moyen</span>
+                    </div>
+                    <p class="exercise-description">
+                        Gestion des erreurs de contrainte d'unicité avec handler CONTINUE.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Apprendre à poursuivre l'exécution après une erreur et gérer les flags.
+                    </div>
+                </div>
+
+                <div class="exercise-card" onclick="selectExercise(4)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">🚨</span>
+                        Exception Nommée + SIGNAL
+                        <span class="difficulty medium">Moyen</span>
+                    </div>
+                    <p class="exercise-description">
+                        Création d'exceptions personnalisées et levée d'erreurs métier.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Implémenter des validations métier avec des erreurs personnalisées.
+                    </div>
+                </div>
+
+                <div class="exercise-card" onclick="selectExercise(5)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">🔄</span>
+                        RESIGNAL - Repropagation
+                        <span class="difficulty hard">Difficile</span>
+                    </div>
+                    <p class="exercise-description">
+                        Modification et repropagation d'erreurs depuis un handler.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Comprendre la différence entre SIGNAL et RESIGNAL dans les handlers.
+                    </div>
+                </div>
+
+                <div class="exercise-card" onclick="selectExercise(6)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">🎯</span>
+                        Handler Multiple Conditions
+                        <span class="difficulty medium">Moyen</span>
+                    </div>
+                    <p class="exercise-description">
+                        Gestion de plusieurs types d'erreurs avec un seul handler.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Apprendre à centraliser la gestion d'erreurs multiples.
+                    </div>
+                </div>
+
+                <div class="exercise-card" onclick="selectExercise(7)">
+                    <div class="exercise-title">
+                        <span class="exercise-icon">⚠️</span>
+                        Handler SQLWARNING
+                        <span class="difficulty medium">Moyen</span>
+                    </div>
+                    <p class="exercise-description">
+                        Détection et gestion des avertissements SQL.
+                    </p>
+                    <div class="exercise-objective">
+                        <div class="objective-title">Objectif :</div>
+                        Comprendre la différence entre erreurs et avertissements.
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <div class="code-header">
+                    <h2 class="code-title" id="current-exercise-title">Handler EXIT - Erreur NOT NULL</h2>
+                    <div class="code-actions">
+                        <button class="btn btn-warning" onclick="showHint()">💡 Aide</button>
+                        <button class="btn btn-success" onclick="showRequirements()">📋 Exigences</button>
+                    </div>
+                </div>
+
+                <div class="statement-section">
+                    <div class="statement-title">
+                        <span>📝 Énoncé de l'Exercice</span>
+                    </div>
+                    <div class="statement-content" id="statement-content">
+Créez une procédure stockée qui tente d'insérer un client sans nom (champ obligatoire). 
+Utilisez un handler EXIT pour gérer l'erreur 1048 et afficher un message personnalisé.
+
+La procédure doit :
+1. Déclarer un flag pour suivre l'état de l'erreur
+2. Utiliser un handler EXIT spécifique pour l'erreur 1048
+3. Tenter d'insérer un client avec un nom NULL
+4. Afficher un message d'erreur personnalisé si l'insertion échoue
+5. Afficher un message de succès si l'insertion réussit
+
+Structure de la table 'clients' :
+- id INT PRIMARY KEY AUTO_INCREMENT
+- nom VARCHAR(100) NOT NULL
+- email VARCHAR(100)
+                    </div>
+                </div>
+
+                <div class="requirements" id="requirements-box" style="display: none;">
+                    <div class="requirements-title">✅ Exigences Techniques :</div>
+                    <ul class="requirements-list" id="requirements-list">
+                        <!-- Rempli dynamiquement -->
+                    </ul>
+                </div>
+
+                <div class="hint-box" id="hint-box" style="display: none;">
+                    <div class="hint-title">💡 Conseil :</div>
+                    <div id="hint-content">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données des exercices (énoncés seulement)
+        const exercises = {
+            1: {
+                title: "Handler EXIT - Erreur NOT NULL",
+                statement: `Créez une procédure stockée qui tente d'insérer un client sans nom (champ obligatoire). 
+Utilisez un handler EXIT pour gérer l'erreur 1048 et afficher un message personnalisé.
+
+La procédure doit :
+• Déclarer un flag pour suivre l'état de l'erreur
+• Utiliser un handler EXIT spécifique pour l'erreur 1048
+• Tenter d'insérer un client avec un nom NULL
+• Afficher un message d'erreur personnalisé dans le handler
+• Afficher un message de succès uniquement si l'insertion réussit
+
+Structure de table attendue :
+CREATE TABLE clients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(100) NOT NULL,
+    email VARCHAR(100)
+);`,
+                requirements: [
+                    "Utiliser DECLARE EXIT HANDLER FOR 1048",
+                    "Déclarer un flag de type INT",
+                    "Afficher un message d'erreur personnalisé",
+                    "Tester le flag après l'insertion",
+                    "Gérer correctement le flux avec EXIT"
+                ],
+                hint: "Le handler EXIT sort immédiatement du bloc BEGIN...END lorsqu'une erreur se produit. Le code placé après l'instruction problématique ne sera pas exécuté."
+            },
+            2: {
+                title: "Handler EXIT - NOT FOUND",
+                statement: `Créez une procédure qui utilise SELECT INTO pour récupérer le nom d'un client à partir de son ID.
+Gérez le cas où le client n'existe pas avec un handler EXIT pour NOT FOUND.
+
+La procédure doit :
+• Prendre un paramètre d'entrée client_id
+• Utiliser SELECT INTO pour récupérer le nom
+• Gérer l'erreur NOT FOUND avec un handler EXIT
+• Afficher un message "Client non trouvé" si l'ID n'existe pas
+• Afficher le nom du client si trouvé
+
+Note : Testez avec un ID qui n'existe pas pour vérifier le handler.`,
+                requirements: [
+                    "Utiliser DECLARE EXIT HANDLER FOR NOT FOUND",
+                    "Paramètre d'entrée client_id INT",
+                    "SELECT INTO avec gestion d'erreur",
+                    "Message personnalisé pour client non trouvé",
+                    "Affichage du nom si client trouvé"
+                ],
+                hint: "NOT FOUND est déclenché quand SELECT INTO ne trouve aucun enregistrement. Le handler EXIT empêche l'exécution du code suivant dans le bloc."
+            },
+            3: {
+                title: "Handler CONTINUE - Doublons",
+                statement: `Créez une procédure qui tente d'insérer un produit avec gestion des doublons de clé via un handler CONTINUE.
+
+La procédure doit :
+• Tenter d'insérer un produit avec un code unique
+• Utiliser un handler CONTINUE pour l'erreur 1062 (doublon)
+• Définir un flag pour indiquer si un doublon a été détecté
+• Poursuivre l'exécution même en cas d'erreur
+• Afficher un message différent selon que l'insertion a réussi ou échoué
+
+Structure de table :
+CREATE TABLE produits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(20) UNIQUE,
+    nom VARCHAR(100)
+);`,
+                requirements: [
+                    "Utiliser DECLARE CONTINUE HANDLER FOR 1062",
+                    "Déclarer et utiliser un flag de doublon",
+                    "Insertion avec valeurs pouvant causer un doublon",
+                    "Poursuite de l'exécution après erreur",
+                    "Message contextuel selon le résultat"
+                ],
+                hint: "CONTINUE permet de poursuivre l'exécution après une erreur. Utilisez un flag pour savoir si l'erreur s'est produite et adapter le comportement."
+            },
+            4: {
+                title: "Exception Nommée + SIGNAL",
+                statement: `Créez une procédure qui vérifie le stock d'un produit avant traitement.
+Utilisez une exception nommée et SIGNAL pour lever une erreur personnalisée si le stock est insuffisant.
+
+La procédure doit :
+• Prendre deux paramètres : produit_id et quantite
+• Vérifier si le stock actuel est suffisant
+• Déclarer une condition nommée pour SQLSTATE '45000'
+• Utiliser SIGNAL pour lever une erreur personnalisée si stock insuffisant
+• Afficher un message de succès si le stock est suffisant
+
+Table produits :
+CREATE TABLE produits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(100),
+    stock INT DEFAULT 0
+);`,
+                requirements: [
+                    "Déclarer une condition avec DECLARE ... CONDITION",
+                    "Utiliser SIGNAL avec SQLSTATE personnalisé",
+                    "Message d'erreur personnalisé avec SET MESSAGE_TEXT",
+                    "Validation métier (stock suffisant)",
+                    "Gestion des paramètres d'entrée"
+                ],
+                hint: "SIGNAL permet de lever des erreurs personnalisées. SQLSTATE '45000' est réservé pour les erreurs applicatives. Pensez à vérifier la condition avant de signaler l'erreur."
+            },
+            5: {
+                title: "RESIGNAL - Repropagation",
+                statement: `Créez une procédure de division qui gère l'erreur division par zéro en utilisant RESIGNAL.
+
+La procédure doit :
+• Prendre deux paramètres décimaux (a et b)
+• Vérifier si le dénominateur est zéro
+• Déclarer une condition nommée pour division par zéro
+• Utiliser un handler CONTINUE avec RESIGNAL
+• Modifier le message d'erreur avec RESIGNAL SET MESSAGE_TEXT
+• Retourner le résultat de la division si possible
+
+Comportement attendu :
+• Division normale : afficher le résultat
+• Division par zéro : erreur personnalisée "Division par zéro impossible"`,
+                requirements: [
+                    "Utiliser RESIGNAL dans un handler",
+                    "Déclarer une condition personnalisée",
+                    "Handler CONTINUE avec RESIGNAL",
+                    "Modification du message d'erreur",
+                    "Validation du dénominateur avant division"
+                ],
+                hint: "RESIGNAL doit être utilisé dans un handler actif. Il permet de modifier le message d'erreur avant de le repropager. Contrairement à SIGNAL, RESIGNAL hérite du contexte d'erreur original."
+            },
+            6: {
+                title: "Handler Multiple Conditions",
+                statement: `Créez une procédure qui gère plusieurs types d'erreurs avec un seul handler EXIT.
+
+La procédure doit :
+• Tenter une opération pouvant générer différentes erreurs
+• Utiliser un handler EXIT pour gérer 1048, 1062 et NOT FOUND
+• Récupérer le message d'erreur original avec GET DIAGNOSTICS
+• Afficher un message générique avec le détail de l'erreur
+• Empêcher l'exécution du code suivant en cas d'erreur
+
+Scénarios à tester :
+• Violation NOT NULL (1048)
+• Doublon de clé (1062) 
+• Enregistrement non trouvé (NOT FOUND)`,
+                requirements: [
+                    "Handler unique pour multiples conditions",
+                    "Utilisation de GET DIAGNOSTICS",
+                    "Gestion des codes 1048, 1062 et NOT FOUND",
+                    "Message d'erreur contextuel",
+                    "Arrêt de l'exécution avec EXIT"
+                ],
+                hint: "Un handler peut gérer plusieurs types d'erreurs en les séparant par des virgules. GET DIAGNOSTICS permet de récupérer les détails de l'erreur survenue."
+            },
+            7: {
+                title: "Handler SQLWARNING",
+                statement: `Créez une procédure qui détecte et compte les avertissements SQL avec un handler SQLWARNING.
+
+La procédure doit :
+• Tenter une opération pouvant générer des avertissements
+• Utiliser un handler CONTINUE pour SQLWARNING
+• Compter le nombre d'avertissements détectés
+• Poursuivre l'exécution normalement
+• Afficher le nombre d'avertissements à la fin
+
+Exemple : insertion avec clé étrangère potentiellement invalide
+Table commandes :
+CREATE TABLE commandes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    client_id INT,
+    date_commande DATE
+);`,
+                requirements: [
+                    "Utiliser DECLARE CONTINUE HANDLER FOR SQLWARNING",
+                    "Compteur d'avertissements",
+                    "Opération générant des warnings",
+                    "Affichage du compte final",
+                    "Poursuite de l'exécution après warnings"
+                ],
+                hint: "SQLWARNING capture les avertissements (codes SQL commençant par '01'). Les avertissements n'interrompent pas l'exécution mais signalent des situations potentiellement problématiques."
+            }
+        };
+
+        let currentExercise = 1;
+
+        function selectExercise(exerciseId) {
+            currentExercise = exerciseId;
+            
+            // Mettre à jour l'interface
+            document.querySelectorAll('.exercise-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelectorAll('.exercise-card')[exerciseId - 1].classList.add('active');
+            
+            // Mettre à jour le contenu
+            const exercise = exercises[exerciseId];
+            document.getElementById('current-exercise-title').textContent = exercise.title;
+            document.getElementById('statement-content').textContent = exercise.statement;
+            
+            // Cacher les boîtes d'aide
+            document.getElementById('hint-box').style.display = 'none';
+            document.getElementById('requirements-box').style.display = 'none';
+        }
+
+        function showHint() {
+            const exercise = exercises[currentExercise];
+            document.getElementById('hint-content').textContent = exercise.hint;
+            document.getElementById('hint-box').style.display = 'block';
+            document.getElementById('requirements-box').style.display = 'none';
+        }
+
+        function showRequirements() {
+            const exercise = exercises[currentExercise];
+            const requirementsList = document.getElementById('requirements-list');
+            requirementsList.innerHTML = '';
+            
+            exercise.requirements.forEach(req => {
+                const li = document.createElement('li');
+                li.textContent = req;
+                requirementsList.appendChild(li);
+            });
+            
+            document.getElementById('requirements-box').style.display = 'block';
+            document.getElementById('hint-box').style.display = 'none';
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Rien à initialiser de plus
+        });
+
+        // Instructions pour les tables de test
+        console.log(`💾 Script de création des tables de test :
+
+-- Tables nécessaires pour les exercices
+CREATE TABLE clients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE produits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(20) UNIQUE,
+    nom VARCHAR(100),
+    stock INT DEFAULT 0
+);
+
+CREATE TABLE commandes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    client_id INT,
+    date_commande DATE
+);
+
+-- Données de test recommandées
+INSERT INTO clients (nom, email) VALUES 
+('Client 1', 'client1@example.com'),
+('Client 2', 'client2@example.com');
+
+INSERT INTO produits (code, nom, stock) VALUES 
+('P001', 'Produit A', 100),
+('P002', 'Produit B', 50);
+        `);
+    </script>
+</body>
+</html>
